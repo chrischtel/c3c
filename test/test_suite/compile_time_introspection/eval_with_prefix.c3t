@@ -1,0 +1,21 @@
+// #target: compile+run
+
+module test;
+
+import std::io;
+
+const FOO = 42;
+const INT_VAR = 123;
+const BAR = 3.14;
+
+fn void main()
+{
+	$assert($eval("FOO") == 42);
+	// Test with $ prefix
+	$assert($eval("$FOO") == 42);
+	// Test with @ prefix
+	$assert($eval("@INT_VAR") == 123);
+	$if $defined($eval("$BAR")):
+		$echo("$BAR is defined");
+	$endif
+}

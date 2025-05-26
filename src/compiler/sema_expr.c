@@ -353,8 +353,22 @@ Expr *sema_ct_eval_expr(SemaContext *context, bool is_type_eval, Expr *inner, bo
 		SEMA_ERROR(inner, "'%s' expects a constant string as the argument.", is_type_eval ? "$evaltype" : "$eval");
 		return NULL;
 	}
+	
+	const char *str = inner->const_expr.bytes.ptr;
+	ArraySize len = inner->const_expr.bytes.len;
+	bool has_prefix = false;
+	
+	// Check if the string has a $ or @ prefix
+	if (len > 0 && (str[0] == '$' || str[0] == '@'))
+	{
+		str++;
+		len--;
+		has_prefix = true;
+	}
+	
 	const char *interned_version = NULL;
-	TokenType token = sema_splitpathref(inner->const_expr.bytes.ptr, inner->const_expr.bytes.len, &path, &interned_version);
+	TokenType token = sema_splitpathref(str, len, &path, &interned_version);
+	
 	switch (token)
 	{
 		case TOKEN_CONST_IDENT:

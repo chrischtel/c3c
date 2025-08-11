@@ -1024,15 +1024,20 @@ static inline Ast *parse_var_stmt(ParseContext *c)
 
 static inline bool parse_ct_compound_stmt(ParseContext *c, AstId *start)
 {
-	AstId *next = start;
-	while (1)
-	{
-		TokenType tok = c->tok;
-		if (tok == TOKEN_CT_ELSE || tok == TOKEN_CT_ENDIF) break;
-		ASSIGN_AST_OR_RET(Ast *stmt, parse_stmt(c), false);
-		ast_append(&next, stmt);
-	}
-	return true;
+        AstId *next = start;
+        while (1)
+        {
+                TokenType tok = c->tok;
+                if (tok == TOKEN_CT_ELSE || tok == TOKEN_CT_ENDIF) break;
+                if (tok == TOKEN_RBRACE || tok == TOKEN_EOF)
+                {
+                        PRINT_ERROR_HERE("Expected '$endif'.");
+                        return false;
+                }
+                ASSIGN_AST_OR_RET(Ast *stmt, parse_stmt(c), false);
+                ast_append(&next, stmt);
+        }
+        return true;
 }
 
 
